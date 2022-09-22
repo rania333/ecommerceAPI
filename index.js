@@ -1,3 +1,5 @@
+const path = require('path')
+
 const dotenv = require('dotenv')
 dotenv.config({ path: 'config.env' }) // lazem l step de l2n asm l file not .env
 const express = require('express')
@@ -19,6 +21,7 @@ const app = express()
 
 //middlewares
 app.use(express.json())
+app.use(express.static(path.join(__dirname, 'uploads'))) //mw to serve file
 
 // route 
 app.use('/category', categoryRoutes)

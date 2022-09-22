@@ -2,6 +2,8 @@ const slugify = require('slugify')
 const asyncHandler = require('express-async-handler')
 const { ErrorHandler } = require('../utils/Error')
 const categoryModel = require('../models/categoryModel')
+const { ApiFeature } = require('../utils/apiFeature')
+
 
 exports.addCategory = asyncHandler(async (req, res) => {
     const { name } = req.body
@@ -11,11 +13,13 @@ exports.addCategory = asyncHandler(async (req, res) => {
 })
 
 exports.getAllCategory = asyncHandler(async (req, res) => {
-    const page = req.query.page * 1 || 1
-    const limit = req.query.limit * 1 || 2
-    const skip = (page - 1) * limit
-    const categories = await categoryModel.find({}).skip(skip).limit(limit)
-    res.status(200).json({ results: categories.length, page, data: categories })
+    const countDocuments = await categoryModel.countDocuments();
+    const apiFeature = new ApiFeature(categoryModel.find(), req.query)
+        .filtering().limitFields().pagination(countDocuments).search().sorting()
+
+    const categories = await apiFeature.mongooseQuery
+
+    res.status(200).json({ results: categories.length, pagination: apiFeature.paginationResult, data: categories })
 })
 
 exports.getSpecificCategory = asyncHandler(async (req, res, nxt) => {

@@ -2,6 +2,7 @@ const slugify = require('slugify')
 const asyncHandler = require('express-async-handler')
 const { ErrorHandler } = require('../utils/Error')
 const subCategoryModel = require('../models/subCategoryModel')
+const { ApiFeature } = require('../utils/apiFeature')
 
 exports.setCategoryIdToBody = (req, res, next) => {
     // Nested route
@@ -25,12 +26,13 @@ exports.createFilterObj = (req, res, next) => {
 };
 
 exports.getAllSubCategoriesController = asyncHandler(async (req, res, nxt) => {
-    const page = req.query.page * 1 || 1
-    const limit = req.query.limit * 1 || 3
-    const skip = (page - 1) * limit
-    const allSubCategories = await subCategoryModel.find(req.filterObj).skip(skip).limit(limit)
-        .populate({ path: 'category', select: 'name -_id' })
-    res.status(200).json({ results: allSubCategories.length, page, data: allSubCategories }
+    const countDocuments = await subCategoryModel.countDocuments();
+    const apiFeature = new ApiFeature(subCategoryModel.find(), req.query)
+        .filtering().limitFields().pagination(countDocuments).search().sorting()
+
+    const allSubCategories = await apiFeature.mongooseQuery
+    // .populate({ path: 'category', select: 'name -_id' })
+    res.status(200).json({ results: allSubCategories.length, pagination: apiFeature.paginationResult, data: allSubCategories }
     )
 })
 

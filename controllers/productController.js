@@ -14,7 +14,7 @@ exports.addProductController = asyncHandler(async (req, res) => {
 exports.getAllProductsController = asyncHandler(async (req, res) => {
     const countDocuments = await productModel.countDocuments();
     const apiFeature = new ApiFeature(productModel.find(), req.query)
-        .filtering().limitFields().pagination(countDocuments).search().sorting()
+        .filtering().limitFields().pagination(countDocuments).search('Product').sorting()
     // .populate({ path: 'category', select: 'name' })
     // .where("price").equals(req.query.price)
 

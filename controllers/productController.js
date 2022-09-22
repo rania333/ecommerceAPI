@@ -12,16 +12,16 @@ exports.addProductController = asyncHandler(async (req, res) => {
 })
 
 exports.getAllProductsController = asyncHandler(async (req, res) => {
-
+    const countDocuments = await productModel.countDocuments();
     const apiFeature = new ApiFeature(productModel.find(), req.query)
-        .filtering().limitFields().pagination().search().sorting()
+        .filtering().limitFields().pagination(countDocuments).search().sorting()
     // .populate({ path: 'category', select: 'name' })
     // .where("price").equals(req.query.price)
 
     //excute query
     const products = await apiFeature.mongooseQuery
 
-    res.status(200).json({ results: products.length, page: apiFeature.page, data: products })
+    res.status(200).json({ results: products.length, paginationResult: apiFeature.paginationResult, data: products })
 })
 
 exports.getSpecificProductController = asyncHandler(async (req, res, nxt) => {

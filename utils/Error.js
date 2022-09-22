@@ -1,0 +1,11 @@
+class ErrorHandler extends Error {
+    constructor(message, statusCode) {
+        super(message)
+        this.statusCode = statusCode
+        this.status = `${this.statusCode}`.startsWith(4) ? 'Failed' : 'Error'
+        this.isOperational = true
+    }
+}
+
+
+exports.ErrorHandler = ErrorHandler

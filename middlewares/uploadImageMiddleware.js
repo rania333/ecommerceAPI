@@ -57,3 +57,50 @@ exports.resizeBrandImage = asyncHandler(async (req, res, next) => {
     next();
 });
 exports.uploadBrand = upload.single('image')
+
+
+
+//product
+exports.resizeProductImage = asyncHandler(async (req, res, next) => {
+    //1- Image processing for imageCover
+    if (req.files.imageCover) {
+        const imageCoverFileName = `product-${uuidv4()}-${Date.now()}-cover.jpeg`;
+
+        await sharp(req.files.imageCover[0].buffer)
+            .resize(2000, 1333)
+            .toFormat('jpeg')
+            .jpeg({ quality: 95 })
+            .toFile(`uploads/product/${imageCoverFileName}`);
+
+        // Save image into our db
+        req.body.imageCover = imageCoverFileName;
+    }
+    //2- Image processing for images
+    if (req.files.images) {
+        req.body.images = [];
+        await Promise.all(
+            req.files.images.map(async (img, index) => {
+                const imageName = `product-${uuidv4()}-${Date.now()}-${index + 1}.jpeg`;
+
+                await sharp(img.buffer)
+                    .resize(2000, 1333)
+                    .toFormat('jpeg')
+                    .jpeg({ quality: 95 })
+                    .toFile(`uploads/product/${imageName}`);
+                // Save image into our db
+                req.body.images.push(imageName);
+            })
+        );
+    }
+    next();
+});
+exports.uploadProduct = upload.fields([
+    {
+        name: 'imageCover',
+        maxCount: 1,
+    },
+    {
+        name: 'images',
+        maxCount: 5,
+    }
+])

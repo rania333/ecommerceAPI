@@ -8,6 +8,7 @@ const categoryRoutes = require('./routes/categoryRoute')
 const subCategoryRoutes = require('./routes/subCategoryRoute')
 const brandRoutes = require('./routes/brandRoutes')
 const productRoutes = require('./routes/productRoutes')
+const userRoutes = require('./routes/userRoutes')
 
 //global err
 const { ErrorHandler } = require('./utils/Error')
@@ -28,6 +29,7 @@ app.use('/category', categoryRoutes)
 app.use('/subcategory', subCategoryRoutes)
 app.use('/brand', brandRoutes)
 app.use('/product', productRoutes)
+app.use('/user', userRoutes)
 app.all('*', (req, res, nxt) => {
     const err = new ErrorHandler("can't find this route", 500)
     nxt(err) //bb3t l err ll middleware

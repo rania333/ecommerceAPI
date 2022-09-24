@@ -104,3 +104,21 @@ exports.uploadProduct = upload.fields([
         maxCount: 5,
     }
 ])
+
+
+//user
+// Image processing for user
+exports.resizeUserImage = asyncHandler(async (req, res, next) => {
+    const filename = `user-${uuidv4()}-${Date.now()}.jpeg`;
+    if (req.file) {
+        await sharp(req.file.buffer)
+            .resize(600, 600)
+            .toFormat('jpeg')
+            .jpeg({ quality: 95 })
+            .toFile(`uploads/user/${filename}`);
+        // Save image into our db
+        req.body.profileImg = filename;
+    }
+    next();
+});
+exports.uploadUser = upload.single('profileImg')

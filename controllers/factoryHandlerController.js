@@ -38,7 +38,6 @@ exports.update = (model) =>
     asyncHandler(async (req, res, next) => {
         const { id } = req.params;
         const { name, title } = req.body;
-        console.log('test')
         const slugged = (name || title) ? slugify(name || title) : undefined
         const doc = await model.findOneAndUpdate(
             { _id: id },

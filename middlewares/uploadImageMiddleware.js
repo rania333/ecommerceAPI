@@ -29,13 +29,15 @@ const multerFilter = function (req, file, cb) {
 // Image processing for category
 exports.resizeCategoryImage = asyncHandler(async (req, res, next) => {
     const filename = `category-${uuidv4()}-${Date.now()}.jpeg`;
-    await sharp(req.file.buffer)
-        .resize(600, 600)
-        .toFormat('jpeg')
-        .jpeg({ quality: 95 })
-        .toFile(`uploads/category/${filename}`);
-    // Save image into our db
-    req.body.image = filename;
+    if (req.file) {
+        await sharp(req.file.buffer)
+            .resize(600, 600)
+            .toFormat('jpeg')
+            .jpeg({ quality: 95 })
+            .toFile(`uploads/category/${filename}`);
+        // Save image into our db
+        req.body.image = filename;
+    }
     next();
 });
 
@@ -47,14 +49,17 @@ exports.uploadCategory = upload.single('image')
 // Image processing for brand
 exports.resizeBrandImage = asyncHandler(async (req, res, next) => {
     const filename = `brand-${uuidv4()}-${Date.now()}.jpeg`;
-    await sharp(req.file.buffer)
-        .resize(600, 600)
-        .toFormat('jpeg')
-        .jpeg({ quality: 95 })
-        .toFile(`uploads/brand/${filename}`);
-    // Save image into our db
-    req.body.image = filename;
+    if (req.file) {
+        await sharp(req.file.buffer)
+            .resize(600, 600)
+            .toFormat('jpeg')
+            .jpeg({ quality: 95 })
+            .toFile(`uploads/brand/${filename}`);
+        // Save image into our db
+        req.body.image = filename;
+    }
     next();
+
 });
 exports.uploadBrand = upload.single('image')
 

@@ -44,10 +44,10 @@ exports.updatePasswordController = asyncHandler(async (req, res) => {
     const { id } = req.params
     const { password } = req.body
 
-    console.log('test', password)
     const user = await userModel.findByIdAndUpdate(id,
         {
-            password: await bcrypt.hash(password, 12)
+            password: await bcrypt.hash(password, 12),
+            passwordChangedAt: Date.now()
         }, { new: true })
     if (!user) {
         return next(new ErrorHandler(`No user for this id ${id}`, 404));

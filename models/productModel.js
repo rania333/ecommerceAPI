@@ -68,8 +68,20 @@ const productSchema = new mongoose.Schema(
             default: 0,
         },
     },
-    { timestamps: true }
+    {
+        timestamps: true,
+        // to enable virtual populate
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true },
+    }
 );
+
+
+productSchema.virtual('reviews', { //k2n b3ml field asmu reviews w a3mlu populate 3adi x l query
+    ref: 'Review',
+    foreignField: 'product', // y3ni l review.product = _id bta3 l schema de
+    localField: '_id',
+});
 
 // Mongoose query middleware
 productSchema.pre(/^find/, function (next) {

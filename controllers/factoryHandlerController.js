@@ -23,10 +23,16 @@ exports.getAll = (model, modelName) =>
         res.status(200).json({ results: docs.length, pagination: apiFeature.paginationResult, data: docs });
     });
 
-exports.getOne = (model) =>
+exports.getOne = (model, populate) =>
     asyncHandler(async (req, res, next) => {
         const { id } = req.params;
-        const doc = await model.findById(id);
+        // build query
+        let query = model.findById(id);
+        if (populate) {
+            query = query.populate(populate)
+        }
+        // run query
+        const doc = await query
         if (!doc) {
             return next(new ErrorHandler(`No document for this id ${id}`, 404));
         }

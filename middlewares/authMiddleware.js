@@ -44,3 +44,12 @@ exports.authenticatedUser = asyncHandler(async (req, res, nxt) => {
     req.user = user
     nxt()
 })
+
+exports.allowedTo = (...roles) => {
+    return asyncHandler(async (req, res, nxt) => {
+        if (!roles.includes(req.user.role)) {
+            return nxt(new ErrorHandler('You are not allowed to access this role', 401))
+        }
+        nxt()
+    })
+}

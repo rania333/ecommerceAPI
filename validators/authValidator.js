@@ -61,3 +61,33 @@ exports.loginValidator = [
 
     validationMiddleware,
 ];
+
+exports.forgetPassValidator = [
+    check('email')
+        .notEmpty()
+        .withMessage('Email required')
+        .isEmail()
+        .withMessage('Invalid email address'),
+    validationMiddleware
+]
+
+exports.verifyResetCodeValidator = [
+    check('resetCode')
+        .notEmpty()
+        .withMessage('resetCode required'),
+    validationMiddleware
+]
+
+exports.resetPasswordValidator = [
+    check('email')
+        .notEmpty()
+        .withMessage('Email required')
+        .isEmail()
+        .withMessage('Invalid email address'),
+    check('password')
+        .notEmpty()
+        .withMessage('Password required')
+        .isLength({ min: 6 })
+        .withMessage('Password must be at least 6 characters'),
+    validationMiddleware
+]

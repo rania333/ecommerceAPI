@@ -19,7 +19,6 @@ exports.authenticatedUser = asyncHandler(async (req, res, nxt) => {
     const decode = jsonWebToken.verify(authHeader, process.env.SECRET_KEY)
     // check if user exist
     const user = await userModel.findById(decode.userId)
-    console.log('tes', user)
     if (!user) {
         nxt(new ErrorHandler('You are not logged in, Please login to get access this', 401))
     }

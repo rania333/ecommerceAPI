@@ -1,9 +1,9 @@
-const jsonWebToken = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const asyncHandler = require('express-async-handler')
 const crypto = require('crypto')
 const userModel = require('../models/userModel');
 const { ErrorHandler } = require('../utils/Error');
+const { generateToken } = require('../utils/token');
 
 exports.signupController = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body
@@ -120,6 +120,3 @@ exports.resetPasswordController = asyncHandler(async (req, res, nxt) => {
 });
 
 
-function generateToken(payload) {
-    return jsonWebToken.sign({ userId: payload }, process.env.SECRET_KEY, { expiresIn: process.env.EXPIRE_TIME })
-}

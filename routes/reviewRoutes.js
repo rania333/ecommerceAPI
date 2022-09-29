@@ -1,14 +1,14 @@
 const express = require('express')
-const { getAllReviewsController, addReviewController, getSpecificReviewController, updateReviewController, deleteReviewController } = require('../controllers/reviewController')
+const { getAllReviewsController, addReviewController, getSpecificReviewController, updateReviewController, deleteReviewController, setProductIdAndUserIdToBody, createFilterObj } = require('../controllers/reviewController')
 
 const { authenticatedUser, allowedTo } = require('../middlewares/authMiddleware')
 const { createReviewValidator, getReviewValidator, updateReviewValidator, deleteReviewValidator } = require('../validators/reviewValidator')
 
-const router = express.Router()
+const router = express.Router({ mergeParams: true })
 
 router.route('/')
-    .post(authenticatedUser, allowedTo('user'), createReviewValidator, addReviewController)
-    .get(getAllReviewsController)
+    .post(authenticatedUser, allowedTo('user'), setProductIdAndUserIdToBody, createReviewValidator, addReviewController)
+    .get(createFilterObj, getAllReviewsController)
 
 router.route('/:id')
     .get(getReviewValidator, getSpecificReviewController)

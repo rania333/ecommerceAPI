@@ -14,12 +14,15 @@ exports.create = (model) =>
 
 exports.getAll = (model, modelName) =>
     asyncHandler(async (req, res) => {
+        let filter = {};
+        if (req.filterObj) {
+            filter = req.filterObj;
+        }
         const countDocuments = await model.countDocuments();
-        const apiFeature = new ApiFeature(model.find(), req.query)
+        const apiFeature = new ApiFeature(model.find(filter), req.query)
             .filtering().limitFields().pagination(countDocuments).search(modelName).sorting()
 
         const docs = await apiFeature.mongooseQuery
-
         res.status(200).json({ results: docs.length, pagination: apiFeature.paginationResult, data: docs });
     });
 

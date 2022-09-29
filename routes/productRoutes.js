@@ -3,8 +3,10 @@ const { getAllProductsController, addProductController, getSpecificProductContro
 const { uploadProduct, resizeProductImage } = require('../middlewares/uploadImageMiddleware')
 const { createProductValidator, getProductValidator, updateProductValidator, deleteProductValidator } = require('../validators/productValidator')
 const { authenticatedUser, allowedTo } = require('../middlewares/authMiddleware')
-
+const reviewsRoute = require('./reviewRoutes')
 const router = express.Router()
+
+router.use('/:productId/review', reviewsRoute);
 
 router.route('/')
     .post(authenticatedUser, allowedTo('admin', 'manager'), uploadProduct, resizeProductImage, createProductValidator, addProductController)

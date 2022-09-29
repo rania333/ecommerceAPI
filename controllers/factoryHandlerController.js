@@ -57,6 +57,8 @@ exports.update = (model) =>
         if (!doc) {
             return next(new ErrorHandler(`No document for this id ${id}`, 404));
         }
+        // tigger save event 3l4an l post middleware tt3ml lma akon 3mlaha 3laa save m4 lazem init
+        doc.save()
         res.status(200).json({ data: doc });
     });
 
@@ -69,5 +71,7 @@ exports.deleteOne = (model) =>
         if (!doc) {
             return next(new ErrorHandler(`No document for this id ${id}`, 404));
         }
+        // trigger remove event
+        doc.remove()
         res.status(200).json({ message: 'document deleted successfully' });
     });

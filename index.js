@@ -12,7 +12,7 @@ const userRoutes = require('./routes/userRoutes')
 const authRoutes = require('./routes/authRoutes')
 const reviewRoutes = require('./routes/reviewRoutes')
 const wishRoutes = require('./routes/wishlistRoutes')
-
+const addressRoutes = require('./routes/addressRoute')
 
 //global err
 const { ErrorHandler } = require('./utils/Error')
@@ -37,6 +37,8 @@ app.use('/user', userRoutes)
 app.use('/auth', authRoutes)
 app.use('/review', reviewRoutes)
 app.use('/wishlist', wishRoutes)
+app.use('/address', addressRoutes)
+
 app.all('*', (req, res, nxt) => {
     const err = new ErrorHandler("can't find this route", 500)
     nxt(err) //bb3t l err ll middleware

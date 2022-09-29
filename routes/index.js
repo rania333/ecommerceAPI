@@ -1,3 +1,4 @@
+const { ErrorHandler } = require('../utils/Error')
 const categoryRoutes = require('./categoryRoute')
 const subCategoryRoutes = require('./subCategoryRoute')
 const brandRoutes = require('./brandRoutes')
@@ -7,7 +8,7 @@ const authRoutes = require('./authRoutes')
 const reviewRoutes = require('./reviewRoutes')
 const wishRoutes = require('./wishlistRoutes')
 const addressRoutes = require('./addressRoute')
-const { ErrorHandler } = require('../utils/Error')
+const couponRoutes = require('./couponRoutes')
 
 
 
@@ -21,6 +22,7 @@ exports.mountRoute = (app) => {
     app.use('/review', reviewRoutes)
     app.use('/wishlist', wishRoutes)
     app.use('/address', addressRoutes)
+    app.use('/coupon', couponRoutes)
     app.all('*', (req, res, nxt) => {
         const err = new ErrorHandler("can't find this route", 500)
         nxt(err) //bb3t l err ll middleware

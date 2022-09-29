@@ -5,7 +5,7 @@ exports.addProductController = create(productModel)
 
 exports.getAllProductsController = getAll(productModel, "Product")
 
-exports.getSpecificProductController = getOne(productModel)
+exports.getSpecificProductController = getOne(productModel, 'reviews')
 
 exports.updateProductController = update(productModel)
 

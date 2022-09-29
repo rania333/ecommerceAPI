@@ -14,19 +14,28 @@ exports.create = (model) =>
 
 exports.getAll = (model, modelName) =>
     asyncHandler(async (req, res) => {
+        let filter = {};
+        if (req.filterObj) {
+            filter = req.filterObj;
+        }
         const countDocuments = await model.countDocuments();
-        const apiFeature = new ApiFeature(model.find(), req.query)
+        const apiFeature = new ApiFeature(model.find(filter), req.query)
             .filtering().limitFields().pagination(countDocuments).search(modelName).sorting()
 
         const docs = await apiFeature.mongooseQuery
-
         res.status(200).json({ results: docs.length, pagination: apiFeature.paginationResult, data: docs });
     });
 
-exports.getOne = (model) =>
+exports.getOne = (model, populate) =>
     asyncHandler(async (req, res, next) => {
         const { id } = req.params;
-        const doc = await model.findById(id);
+        // build query
+        let query = model.findById(id);
+        if (populate) {
+            query = query.populate(populate)
+        }
+        // run query
+        const doc = await query
         if (!doc) {
             return next(new ErrorHandler(`No document for this id ${id}`, 404));
         }
@@ -48,6 +57,8 @@ exports.update = (model) =>
         if (!doc) {
             return next(new ErrorHandler(`No document for this id ${id}`, 404));
         }
+        // tigger save event 3l4an l post middleware tt3ml lma akon 3mlaha 3laa save m4 lazem init
+        doc.save()
         res.status(200).json({ data: doc });
     });
 
@@ -60,5 +71,7 @@ exports.deleteOne = (model) =>
         if (!doc) {
             return next(new ErrorHandler(`No document for this id ${id}`, 404));
         }
+        // trigger remove event
+        doc.remove()
         res.status(200).json({ message: 'document deleted successfully' });
     });

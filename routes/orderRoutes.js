@@ -1,11 +1,17 @@
 const express = require('express');
-const { createOrder, filterOrderForLoggedUser, findAllOrders, findSpecificOrder, updateOrderToPaid, updateOrderToDelivered } = require('../controllers/orderController');
+const { createOrder, filterOrderForLoggedUser, findAllOrders, findSpecificOrder, updateOrderToPaid, updateOrderToDelivered, checkoutSession } = require('../controllers/orderController');
 
 const { authenticatedUser, allowedTo } = require('../middlewares/authMiddleware')
 
 
 const router = express.Router();
 router.use(authenticatedUser)
+
+router.get(
+    '/checkout-session',
+    allowedTo('user'),
+    checkoutSession
+);
 
 router.route('/').post(allowedTo('user'), createOrder);
 

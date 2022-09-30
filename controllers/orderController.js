@@ -1,11 +1,11 @@
 const asyncHandler = require('express-async-handler');
+const stripe = require('stripe')(process.env.STRIPE_KEY);
 const cartModel = require('../models/cartModel')
 const productModel = require('../models/productModel')
 const orderModel = require('../models/orderModel')
 const couponModel = require('../models/couponModel')
 
 const { ErrorHandler } = require('../utils/Error');
-const { request } = require('express');
 const { getAll, getOne } = require('./factoryHandlerController');
 
 
@@ -101,3 +101,45 @@ exports.updateOrderToDelivered = asyncHandler(async (req, res, next) => {
 });
 
 
+// @desc    Get checkout session from stripe and send it as response
+// @route   GET /api/v1/orders/checkout-session/cartId
+// @access  Protected/User
+exports.checkoutSession = asyncHandler(async (req, res, next) => {
+    // app settings
+    const taxPrice = 0;
+    const shippingPrice = 0;
+
+    // 1) Get cart depend on cartId
+    const cart = await cartModel.findOne({ user: req.user._id });
+    if (!cart) {
+        return next(
+            new ErrorHandler(`There is no such cart with id ${cart._id}`, 404)
+        );
+    }
+
+    // 2) Get order price depend on cart price "Check if coupon apply"
+    const cartPrice = cart.totalPriceAfterDiscount || cart.totalCartPrice
+
+    const totalOrderPrice = cartPrice + taxPrice + shippingPrice;
+
+    // 3) Create stripe checkout session
+    const session = await stripe.checkout.sessions.create({
+        line_items: [
+            {
+                name: req.user.name,
+                amount: totalOrderPrice * 100,
+                currency: 'egp',
+                quantity: 1,
+            },
+        ],
+        mode: 'payment',
+        success_url: `${req.protocol}://${req.get('host')}/order`,
+        cancel_url: `${req.protocol}://${req.get('host')}/cart`,
+        customer_email: req.user.email,
+        client_reference_id: cart._id,
+        metadata: req.body.shippingAddress,
+    });
+
+    // 4) send session to response
+    res.status(200).json({ status: 'success', session });
+});

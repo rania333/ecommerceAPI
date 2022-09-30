@@ -3,7 +3,7 @@ const stripe = require('stripe')(process.env.STRIPE_KEY);
 const cartModel = require('../models/cartModel')
 const productModel = require('../models/productModel')
 const orderModel = require('../models/orderModel')
-const couponModel = require('../models/couponModel')
+const userModel = require('../models/userModel')
 
 const { ErrorHandler } = require('../utils/Error');
 const { getAll, getOne } = require('./factoryHandlerController');
@@ -175,11 +175,11 @@ const createCardOrder = async (session) => {
     const shippingAddress = session.metadata;
     const oderPrice = session.amount_total / 100;
 
-    const cart = await Cart.findById(cartId);
-    const user = await User.findOne({ email: session.customer_email });
+    const cart = await cartModel.findById(cartId);
+    const user = await userModel.findOne({ email: session.customer_email });
 
     // 3) Create order with default paymentMethodType card
-    const order = await Order.create({
+    const order = await orderModel.create({
         user: user._id,
         cartItems: cart.cartItems,
         shippingAddress,
@@ -197,9 +197,9 @@ const createCardOrder = async (session) => {
                 update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
             },
         }));
-        await Product.bulkWrite(bulkOption, {});
+        await productModel.bulkWrite(bulkOption, {});
 
         // 5) Clear cart depend on cartId
-        await Cart.findByIdAndDelete(cartId);
+        await cartModel.findByIdAndDelete(cartId);
     }
 };

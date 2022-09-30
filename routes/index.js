@@ -10,7 +10,7 @@ const wishRoutes = require('./wishlistRoutes')
 const addressRoutes = require('./addressRoute')
 const couponRoutes = require('./couponRoutes')
 const cartRoutes = require('./cartrRoutes')
-
+const orderRoutes = require('./orderRoutes')
 
 exports.mountRoute = (app) => {
     app.use('/category', categoryRoutes)
@@ -24,6 +24,7 @@ exports.mountRoute = (app) => {
     app.use('/address', addressRoutes)
     app.use('/coupon', couponRoutes)
     app.use('/cart', cartRoutes)
+    app.use('/order', orderRoutes)
     app.all('*', (req, res, nxt) => {
         const err = new ErrorHandler("can't find this route", 500)
         nxt(err) //bb3t l err ll middleware

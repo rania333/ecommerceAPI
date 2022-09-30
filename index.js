@@ -3,6 +3,8 @@ const path = require('path')
 const dotenv = require('dotenv')
 dotenv.config({ path: 'config.env' }) // lazem l step de l2n asm l file not .env
 const express = require('express')
+const cors = require('cors');
+const compression = require('compression');
 //routes
 
 //global err
@@ -15,6 +17,9 @@ dbConnection()
 
 const app = express()
 
+app.use(cors());
+app.options('*', cors());
+app.use(compression())
 //middlewares
 app.use(express.json())
 app.use(express.static(path.join(__dirname, 'uploads'))) //mw to serve file

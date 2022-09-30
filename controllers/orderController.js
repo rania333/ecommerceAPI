@@ -123,8 +123,6 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
     const totalOrderPrice = cartPrice + taxPrice + shippingPrice;
 
     // 3) Create stripe checkout session
-    console.log('test', stripe.checkout.sessions.create())
-
     const session = await stripe.checkout.sessions.create({
         line_items: [
             {
@@ -148,4 +146,27 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
 
     // 4) send session to response
     res.status(200).json({ status: 'success', session });
+});
+
+exports.webhookCheckout = asyncHandler(async (req, res, next) => {
+    const sig = req.headers['stripe-signature'];
+
+    let event;
+
+    try {
+        event = stripe.webhooks.constructEvent(
+            req.body,
+            sig,
+            process.env.STRIPE_HOOK
+        );
+    } catch (err) {
+        return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+    if (event.type === 'checkout.session.completed') {
+        //  Create order
+        console.log('test')
+        //   createCardOrder(event.data.object);
+    }
+
+    res.status(200).json({ received: true });
 });

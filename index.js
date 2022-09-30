@@ -12,7 +12,8 @@ const { ErrorMiddleware } = require('./middlewares/errMiddleware')
 
 //db connection
 const dbConnection = require('./config/database')
-const { mountRoute } = require('./routes')
+const { mountRoute } = require('./routes');
+const { webhookCheckout } = require('./controllers/orderController');
 dbConnection()
 
 const app = express()
@@ -20,6 +21,14 @@ const app = express()
 app.use(cors());
 app.options('*', cors());
 app.use(compression())
+
+// Checkout webhook
+app.post(
+    '/webhook-checkout',
+    express.raw({ type: 'application/json' }),
+    webhookCheckout
+);
+
 //middlewares
 app.use(express.json())
 app.use(express.static(path.join(__dirname, 'uploads'))) //mw to serve file

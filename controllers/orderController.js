@@ -110,10 +110,10 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
     const shippingPrice = 0;
 
     // 1) Get cart depend on cartId
-    const cart = await cartModel.findOne({ user: req.user._id });
+    const cart = await cartModel.findById(req.params.cartId);
     if (!cart) {
         return next(
-            new ErrorHandler(`There is no such cart with id ${cart._id}`, 404)
+            new ErrorHandler(`There is no such cart with id ${req.params.cartId}`, 404)
         );
     }
 
@@ -140,7 +140,7 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
         success_url: `${req.protocol}://${req.get('host')}/order`,
         cancel_url: `${req.protocol}://${req.get('host')}/cart`,
         customer_email: req.user.email,
-        client_reference_id: cart._id,
+        client_reference_id: req.params.cartId,
         metadata: req.body.shippingAddress,
     });
 
@@ -164,9 +164,42 @@ exports.webhookCheckout = asyncHandler(async (req, res, next) => {
     }
     if (event.type === 'checkout.session.completed') {
         //  Create order
-        console.log('test')
-        //   createCardOrder(event.data.object);
+        createCardOrder(event.data.object);
     }
 
     res.status(200).json({ received: true });
 });
+
+const createCardOrder = async (session) => {
+    const cartId = session.client_reference_id;
+    const shippingAddress = session.metadata;
+    const oderPrice = session.amount_total / 100;
+
+    const cart = await Cart.findById(cartId);
+    const user = await User.findOne({ email: session.customer_email });
+
+    // 3) Create order with default paymentMethodType card
+    const order = await Order.create({
+        user: user._id,
+        cartItems: cart.cartItems,
+        shippingAddress,
+        totalOrderPrice: oderPrice,
+        isPaid: true,
+        paidAt: Date.now(),
+        paymentMethodType: 'card',
+    });
+
+    // 4) After creating order, decrement product quantity, increment product sold
+    if (order) {
+        const bulkOption = cart.cartItems.map((item) => ({
+            updateOne: {
+                filter: { _id: item.product },
+                update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
+            },
+        }));
+        await Product.bulkWrite(bulkOption, {});
+
+        // 5) Clear cart depend on cartId
+        await Cart.findByIdAndDelete(cartId);
+    }
+};

@@ -8,7 +8,7 @@ const router = express.Router();
 router.use(authenticatedUser)
 
 router.get(
-    '/checkout-session',
+    '/checkout-session/:cartId',
     allowedTo('user'),
     checkoutSession
 );

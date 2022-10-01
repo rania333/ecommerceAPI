@@ -6,6 +6,7 @@ const express = require('express')
 const cors = require('cors');
 const compression = require('compression');
 const rateLimiter = require('express-rate-limit')
+const hpp = require('hpp')
 //routes
 
 //global err
@@ -45,7 +46,17 @@ const limiter = rateLimiter({
 // Apply the rate limiting middleware to all requests
 app.use('/', limiter);
 
-
+app.use(
+    hpp({
+        whitelist: [
+            'price',
+            'sold',
+            'quantity',
+            'ratingsAverage',
+            'ratingsQuantity',
+        ],
+    })
+);
 // mount route 
 mountRoute(app)
 //err handler
